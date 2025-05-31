@@ -57,3 +57,127 @@ User Stories
 5.	As a Business Owner, I want to generate sales reports so that I can analyze business performance.
 
 
+
+Milestone Two Assignment: Design & API Contract Development
+
+Objective: Design the application’s architecture, database schema, and develop API contracts.
+
+High-Level Architecture
+Components Breakdown
+Frontend: React SPA with Material-UI
+API Gateway: Express.js router
+Microservices:
+o	Auth Service (JWT)
+o	Inventory Service
+o	Reporting Service
+Database: MongoDB Atlas
+External Integrations:
+o	Barcode Scanner API
+o	Email/SMS Alert Service
+
+![Architecture Image](https://github.com/user-attachments/assets/3ceae7ac-b587-412f-8166-ec8f3304462b)
+
+
+Database Schema Design
+o	Define the necessary tables, relationships, and entities for the app.
+o	Create ER diagrams (entity-relationship) and discuss CRUD operations.
+
+![ERDiagram](https://github.com/user-attachments/assets/dab03501-9cdb-4758-92a8-03b89aa8c2b5)
+
+erDiagram
+    USER ||--o{ PRODUCT : creates
+    USER ||--o{ SUPPLIER : manages
+    PRODUCT }|--|| SUPPLIER : supplied_by
+    PRODUCT ||--o{ STOCK_MOVEMENT : has
+    PRODUCT {
+        string _id PK
+        string name
+        string sku
+        string category
+        number currentStock
+        number lowStockThreshold
+        date expiryDate
+        objectId supplierId FK
+    }
+    
+SUPPLIER {
+        string _id PK
+        string name
+        string contactEmail
+        string phone
+    }
+    
+STOCK_MOVEMENT {
+        string _id PK
+        objectId productId FK
+        number quantity
+        string movementType
+        date timestamp
+    }
+    
+USER {
+        string _id PK
+        string email
+        string passwordHash
+        string role
+    }
+
+
+Collections Description
+Collection	Fields	Relationships
+products	_id, name, sku, category, currentStock, expiryDate, supplierId	Belongs to supplier
+suppliers	_id, name, contactEmail, phone	Has many products
+stock_movements	_id, productId, quantity, movementType, timestamp	References product
+users	_id, email, passwordHash, role (admin/manager/staff)	
+
+
+
+API Contract
+o	Define the API endpoints, request/response format, and authorization needs.
+
+Base URL: https://api.smartstock.in/v1
+Products
+
+GET /products
+# Response
+{
+  "data": [
+    {
+      "_id": "prod123",
+      "name": "Organic Milk",
+      "currentStock": 42,
+      "lowStockThreshold": 20,
+      "expiryDate": "2023-12-31"
+    }
+  ]
+}
+
+POST /products
+# Request
+{
+  "name": "New Product",
+  "sku": "SKU123",
+  "initialStock": 100
+}
+
+Inventory
+
+PATCH /inventory/{productId}/adjust
+# Request
+{
+  "adjustment": -5,
+  "reason": "sale"
+}
+
+Reporting
+
+GET /reports/expiry-alerts
+# Response
+{
+  "critical": [
+    { "product": "Yogurt", "daysUntilExpiry": 2 }
+  ],
+  "warning": []
+}
+
+
