@@ -1,6 +1,7 @@
-SmartStock: Inventory Management System – Capstone Project Proposal
+SMARTSTOCK: INVENTORY MANAGEMENT SYSTEM – CAPSTONE PROJECT PROPOSAL
 
-Project Title: Smart Stock: Advanced Inventory Management System
+Project Title: SmartStock: Advanced Inventory Management System
+
 Problem Statement
 Managing inventory efficiently is crucial for businesses, but many small and medium-sized enterprises (SMEs) still rely on manual tracking or outdated systems, leading to stock discrepancies, lost sales, and operational inefficiencies.
 
@@ -12,7 +13,6 @@ Why is this problem significant?
 
 This project aims to provide a user-friendly, cost-effective inventory management system that helps businesses track stock levels, manage suppliers, and generate reports—all in one place.
 
-________________________________________
 Overview of the Application’s Functionality
 Smart Stock: Is a full-stack web application that allows businesses to:
 •	Track inventory in real-time with stock level alerts.
@@ -27,7 +27,6 @@ The system will have:
 •	JWT authentication for secure login.
 •	RESTful APIs for data exchange.
 
-________________________________________
 Technology Stack
 Category	Technologies
 Frontend	React.js, TypeScript, Material-UI, React Query, Formik + Yup
@@ -35,7 +34,7 @@ Backend	Node.js, Express.js, MongoDB (Mongoose), JWT
 DevOps	Git, GitHub, Vercel (Frontend Hosting), Render (Backend Hosting)
 Testing	Jest (Unit Testing), Postman (API Testing)
 Additional Tools	Barcode.js (for barcode generation), Chart.js (for analytics)
-________________________________________
+
 Features to be Implemented
 Core Features (MVP - Minimum Viable Product)
 Product Management – Add, edit, delete, and categorize products.
@@ -49,7 +48,6 @@ Additional Features (Future Enhancements)
 🔹 Advanced Reporting – Export data to Excel/PDF, sales analytics.
 🔹 Multi-Warehouse Support – Track inventory across multiple locations.
 🔹 Mobile App Integration – Sync with a React Native app.
-________________________________________
 
 User Stories
 1.	As an Admin, I want to add new products to the inventory so that I can keep track of available stock.
@@ -57,4 +55,5 @@ User Stories
 3.	As a Staff Member, I want to update stock levels after sales so that inventory records stay accurate.
 4.	As a Supplier, I want to view purchase orders so that I know what to deliver.
 5.	As a Business Owner, I want to generate sales reports so that I can analyze business performance.
+
 
