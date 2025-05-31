@@ -58,7 +58,7 @@ User Stories
 
 
 
-Milestone Two Assignment: Design & API Contract Development
+MILESTONE TWO ASSIGNMENT: DESIGN & API CONTRACT DEVELOPMENT
 
 Objective: Design the application’s architecture, database schema, and develop API contracts.
 
@@ -75,6 +75,7 @@ External Integrations:
 o	Barcode Scanner API
 o	Email/SMS Alert Service
 
+
 ![Architecture Image](https://github.com/user-attachments/assets/3ceae7ac-b587-412f-8166-ec8f3304462b)
 
 
@@ -82,7 +83,9 @@ Database Schema Design
 o	Define the necessary tables, relationships, and entities for the app.
 o	Create ER diagrams (entity-relationship) and discuss CRUD operations.
 
+
 ![ERDiagram](https://github.com/user-attachments/assets/dab03501-9cdb-4758-92a8-03b89aa8c2b5)
+
 
 erDiagram
     USER ||--o{ PRODUCT : creates
