@@ -179,6 +179,365 @@ GET /reports/expiry-alerts
 {
   "critical": [
     { "product": "Yogurt", "daysUntilExpiry": 2 }
+
+
+
+MILESTONE PROJECT: DEVELOPMENT – BACKEND IMPLEMENTATION 2 WEEKS
+Objective:
+Start implementing the core functionalities of the application, focusing on backend development first.
+________________________________________
+First, Install These on Your Computer:
+•	Node.js (LTS version)
+•	MongoDB Community Server
+•	Postman (for API testing)
+InitializeNode.jsProject
+•	mkdir smartstock-backend
+•	cd smartstock-backend
+•	npm init -y
+________________________________________
+InstallRequiredDependencies
+•	npm install express mongoose body-parser cors dotenv
+•	npm install --save-dev nodemon
+
+o	express: Web framework for Node.js
+o	mongoose: MongoDB object modeling
+o	body-parser: Parse incoming request bodies
+o	cors: Enable Cross-Origin Resource Sharing
+o	dotenv: Load environment variables
+o	nodemon: Automatically restart server during development
+________________________________________
+CreateExpressServer (server.js)
+// Load environment variables
+require('dotenv').config();
+
+// Import required packages
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+// Create Express app
+const app = express();
+
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(bodyParser.json()); // Parse JSON bodies
+
+// Database connection
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+// Simple test route
+app.get('/', (req, res) => {
+    res.send('SmartStock Backend is running!');
+});
+
+// Set the port
+const PORT = process.env.PORT || 5000;
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+________________________________________
+Configure Environment Variables (.env)
+MONGODB_URI=mongodb://localhost:27017/smartstock
+PORT=5000
+________________________________________
+Set Up Development Script (package.json)
+"scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+}
+
+Now you can run the server with: npm run dev
+
+Your server should be running at http://localhost:5000
+________________________________________
+Database Integration with MongoDB
+Create the Models Folder
+mkdir models
+________________________________________
+CreateTheProductModel (models/Product.js)
+const mongoose = require('mongoose');
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Product name is required'],
+        trim: true
+    },
+    description: {
+        type: String,
+        trim: true
+    },
+    sku: {
+        type: String,
+        required: [true, 'SKU is required'],
+        unique: true,
+        trim: true
+    },
+    category: {
+        type: String,
+        required: [true, 'Category is required']
+    },
+    price: {
+        type: Number,
+        required: [true, 'Price is required'],
+        min: [0, 'Price cannot be negative']
+    },
+    cost: {
+        type: Number,
+        min: [0, 'Cost cannot be negative']
+    },
+    reorderLevel: {
+        type: Number,
+        default: 5,
+        min: [0, 'Reorder level cannot be negative']
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Update the updatedAt field before saving
+productSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+module.exports = mongoose.model('Product', productSchema);
+________________________________________
+
+CreateTheInventoryModel (models/Inventory.js)
+
+const mongoose = require('mongoose');
+
+const inventorySchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: [true, 'Product reference is required']
+    },
+    quantity: {
+        type: Number,
+        required: [true, 'Quantity is required'],
+        min: [0, 'Quantity cannot be negative']
+    },
+    location: {
+        type: String,
+        required: [true, 'Location is required']
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    },
+    status: {
+        type: String,
+        enum: ['in-stock', 'low-stock', 'out-of-stock'],
+        default: 'in-stock'
+    }
+});
+
+module.exports = mongoose.model('Inventory', inventorySchema);
+________________________________________
+
+DevelopingAPIRoutes
+
+Create the Routes and Controllers Structure
+
+mkdir routes controllers
+
+Create Product Routes (routes/products.js)
+
+const express = require('express');
+const router = express.Router();
+const {
+    createProduct,
+    getAllProducts,
+    getProductById,
+    updateProduct,
+    deleteProduct
+} = require('../controllers/productController');
+
+// Product CRUD routes
+router.post('/', createProduct);
+router.get('/', getAllProducts);
+router.get('/:id', getProductById);
+router.put('/:id', updateProduct);
+router.delete('/:id', deleteProduct);
+
+module.exports = router;
+________________________________________
+
+
+CreateProductController (controllers/productController.js)
+const Product = require('../models/Product');
+
+// Create a new product
+exports.createProduct = async (req, res) => {
+    try {
+        const product = new Product(req.body);
+        await product.save();
+        res.status(201).json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+// Get all products
+exports.getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            data: products
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+// Get product by ID
+exports.getProductById = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                error: 'Product not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+// Update product
+exports.updateProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { 
+                new: true,
+                runValidators: true
+            }
+        );
+        
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                error: 'Product not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+// Delete product
+exports.deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                error: 'Product not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: {}
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+________________________________________
+
+TestingYourAPIWithPostman
+
+Create a Product:
+•	Method: POST
+•	URL: http://localhost:5000/api/products
+•	Headers:
+o	Key: Content-Type
+o	Value: application/json
+•	Body (raw, JSON):
+
+{
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with 2.4GHz connection",
+    "sku": "WM-1001",
+    "category": "Computer Accessories",
+    "price": 24.99,
+    "cost": 12.50,
+    "reorderLevel": 10
+}
+
+
+ 
+
+Get All Products:
+•	Method: GET
+•	URL: http://localhost:5000/api/products
+
+ 
+
+Get Single Product:
+•	Method: GET
+•	URL: http://localhost:5000/api/products/ID
+
+ 
+
+Update Product:
+•	Method: PUT
+•	URL: http://localhost:5000/api/products/[ID]
+•	Body (raw, JSON):
+
+ 
+
   ],
   "warning": []
 }
